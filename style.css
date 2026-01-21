@@ -1,0 +1,95 @@
+:root {
+  --panel-bg: #2c2c2c;
+  --canvas-bg: #1e1e1e;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+}
+
+main {
+  width: 100%;
+  height: 100%;
+}
+
+.app {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.left-panel {
+    width: 260px;
+    min-width: 240px;
+    background-color: var(--panel-bg);
+    display: flex;
+}
+
+.canvas {
+    flex: 1;
+    background-color: var(--canvas-bg);
+}
+
+.right-panel {
+    width: 300px;
+    min-width: 260px;
+    background-color: var(--panel-bg);
+}
+
+.left-panel .sidebar-icons{
+    width: 20%;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.left-panel .sidebar-elements{
+    width: 80%;
+    border-right: 1px solid rgba(255,255,255,0.08);;
+}
+
+.left-panel .sidebar-elements .title{
+    padding: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+} 
+
+.left-panel .sidebar-elements .title h2{
+    font-size: 18px;
+}
+
+.left-panel .sidebar-elements .pages{
+    padding: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+} 
+
+.left-panel .sidebar-elements .pages h3,
+.left-panel .sidebar-elements .layers h3{
+    font-size: 15px;
+}
+
+.left-panel .sidebar-elements .layers{
+    padding: 15px;
+}
+
+.canvas{
+    position: relative;
+}
+
+.tools{
+    position: absolute;
+    bottom: 2%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50%;
+    height: 7%;
+    background-color: var(--panel-bg);
+    border-radius: 15px;
+}
+
+            
+            
