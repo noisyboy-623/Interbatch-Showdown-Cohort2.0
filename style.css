@@ -26,8 +26,8 @@ main {
 }
 
 .left-panel {
-    width: 260px;
-    min-width: 240px;
+    width: 300px;
+    min-width: 260px;
     background-color: var(--panel-bg);
     display: flex;
 }
@@ -38,7 +38,7 @@ main {
 }
 
 .right-panel {
-    width: 300px;
+    width: 280px;
     min-width: 260px;
     background-color: var(--panel-bg);
 }
@@ -80,6 +80,34 @@ main {
     position: relative;
 }
 
+.canvas-element {
+  position: absolute;
+  /* border: 2px solid #4da3ff; */
+  /* background-color: rgba(77, 163, 255, 0.15); */
+  cursor: pointer;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.rectangle{
+    width: 200px;
+    height: 120px;
+    background-color: #d9d9d9;
+}
+
+.text{
+    width: 180px;
+    height: 40px;
+    background-color: transparent;
+    color: #fff;
+    padding: 6px;
+}
+
+[contenteditable="true"]:focus { 
+    outline: none; 
+}
+
 .tools{
     position: absolute;
     bottom: 2%;
@@ -90,6 +118,47 @@ main {
     background-color: var(--panel-bg);
     border-radius: 15px;
 }
+
+/* Selected state */
+.canvas-element.selected {
+  outline: 2px solid #4da3ff;
+  outline-offset: -2px;
+}
+
+/* Resize handles */
+.resize-handle {
+  width: 8px;
+  height: 8px;
+  background-color: #ffffff;
+  border: 1px solid #4da3ff;
+  position: absolute;
+}
+
+/* Corner positions */
+.resize-handle.top-left {
+  top: -4px;
+  left: -4px;
+  cursor: nwse-resize;
+}
+
+.resize-handle.top-right {
+  top: -4px;
+  right: -4px;
+  cursor: nesw-resize;
+}
+
+.resize-handle.bottom-left {
+  bottom: -4px;
+  left: -4px;
+  cursor: nesw-resize;
+}
+
+.resize-handle.bottom-right {
+  bottom: -4px;
+  right: -4px;
+  cursor: nwse-resize;
+}
+
 
             
             
