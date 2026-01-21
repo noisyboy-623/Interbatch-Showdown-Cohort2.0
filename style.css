@@ -78,6 +78,7 @@ main {
 
 .canvas{
     position: relative;
+    overflow: hidden;
 }
 
 .canvas-element {
@@ -85,9 +86,10 @@ main {
   /* border: 2px solid #4da3ff; */
   /* background-color: rgba(77, 163, 255, 0.15); */
   cursor: pointer;
-  top: 50%;
+  transform-origin: center center;
+  /* top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%); */
 }
 
 .rectangle{
@@ -96,17 +98,36 @@ main {
     background-color: #d9d9d9;
 }
 
-.text{
+/* .text{
     width: 180px;
     height: 40px;
     background-color: transparent;
     color: #fff;
     padding: 6px;
+    overflow: hidden;
+} */
+
+/* [contenteditable="true"]:focus { 
+    outline: none; 
+} */
+
+.text-content {
+    min-width: 160px;
+    min-height: 40px;
+    padding: 6px;
+    color: #fff;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    outline: none;
 }
 
-[contenteditable="true"]:focus { 
-    outline: none; 
+.text-content:empty::before {
+    content: attr(data-placeholder);
+    color: rgba(255,255,255,0.4);
+    pointer-events: none;
 }
+
 
 .tools{
     position: absolute;
@@ -117,6 +138,7 @@ main {
     height: 7%;
     background-color: var(--panel-bg);
     border-radius: 15px;
+    z-index: 10;
 }
 
 /* Selected state */
@@ -127,8 +149,8 @@ main {
 
 /* Resize handles */
 .resize-handle {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   background-color: #ffffff;
   border: 1px solid #4da3ff;
   position: absolute;
@@ -158,6 +180,21 @@ main {
   right: -4px;
   cursor: nwse-resize;
 }
+
+.rotate-handle {
+  width: 10px;
+  height: 10px;
+  background: #4da3ff;
+  border-radius: 50%;
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: grab;
+}
+
+
+
 
 
             
