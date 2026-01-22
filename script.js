@@ -56,7 +56,7 @@ function syncElemCounter() {
 
   let maxId = 0;
 
-  allElem.forEach(elem => {
+  allElem.forEach((elem) => {
     const match = elem.id.match(/elem-(\d+)/);
     if (match) {
       const num = parseInt(match[1], 10);
@@ -66,7 +66,6 @@ function syncElemCounter() {
 
   elemCounter = maxId;
 }
-
 
 function createRectangle() {
   const rect = document.createElement("div");
@@ -171,8 +170,8 @@ canvas.addEventListener("mousedown", () => {
   deselectElem();
 });
 
-// Drag Logic
-
+// Drag Core Logic
+//Logic: track mouse offsets on mouse down, update position on mousemove, setting the bounds and applying movement via CSS
 function startDrag(e) {
   if (!selectedElem) return;
 
@@ -208,7 +207,7 @@ document.addEventListener("mousemove", (e) => {
   updatePropsPanel();
 });
 
-// Resize and Rotate Logic
+// Resize Handles
 
 function addResizeHandles(element) {
   const positions = ["top-left", "top-right", "bottom-left", "bottom-right"];
@@ -247,6 +246,7 @@ function removeResizeHandles(element) {
 }
 
 // Resize Core Logic
+//Logic: Track mouse movement from handle, size and position update, setting bounds
 
 function startResize(e, direction) {
   if (!selectedElem) return;
@@ -311,6 +311,7 @@ document.addEventListener("mousemove", (e) => {
 });
 
 // Rotate Core Logic
+//Logic: calculating angle between center and mouse position on mousedown, update rotation on mousemove
 
 function startRotate(e) {
   if (!selectedElem) return;
@@ -422,6 +423,7 @@ function updateLayersPanel() {
     });
 }
 
+//Logic: update z-index based on order in allElem array
 function updateZIndex() {
   allElem.forEach((elem, idx) => {
     elem.style.zIndex = idx;
@@ -719,10 +721,8 @@ function loadDataFromLocalStorage() {
   updateLayersPanel();
   updatePropertiesVisibility();
 
-  
-syncElemCounter();
-
-};
+  syncElemCounter();
+}
 
 function fetchData() {
   return allElem.map((elem) => {
@@ -750,11 +750,41 @@ function fetchData() {
   });
 }
 
+//Logic: fetch current data, convert to JSON string, create blob and trigger download
 function exportAsJSON() {
   const data = fetchData();
   const json = JSON.stringify(data, null, 2);
 
   downloadFile(json, "design.json", "application/json");
+}
+
+//Logic: fetch current data, generate HTML structure with inline styles, create blob and trigger download
+function generateHTML(item) {
+  const baseStyle = `
+    position: absolute;
+    width: ${item.width}px;
+    height: ${item.height}px;
+    transform: translate(${item.x}px, ${item.y}px) rotate(${item.rotation}deg);
+    transform-origin: center center;
+    background-color: ${item.styles.backgroundColor || "#ffffff"};
+  `;
+
+  if (item.type === "textbox") {
+    return `
+<div style="${baseStyle}">
+  <div style="
+    width:100%;
+    height:100%;
+    white-space:pre-wrap;
+    color: #000;              
+    font-family: sans-serif;   
+  ">
+    ${item.content || ""}
+  </div>
+</div>`;
+  }
+
+  return `<div style="${baseStyle}"></div>`;
 }
 
 function exportAsHTML() {
@@ -789,34 +819,6 @@ function exportAsHTML() {
 `;
 
   downloadFile(html, "design.html", "text/html");
-}
-
-function generateHTML(item) {
-  const baseStyle = `
-    position: absolute;
-    width: ${item.width}px;
-    height: ${item.height}px;
-    transform: translate(${item.x}px, ${item.y}px) rotate(${item.rotation}deg);
-    transform-origin: center center;
-    background-color: ${item.styles.backgroundColor || "#ffffff"};
-  `;
-
-  if (item.type === "textbox") {
-    return `
-<div style="${baseStyle}">
-  <div style="
-    width:100%;
-    height:100%;
-    white-space:pre-wrap;
-    color: #000;              
-    font-family: sans-serif;   
-  ">
-    ${item.content || ""}
-  </div>
-</div>`;
-  }
-
-  return `<div style="${baseStyle}"></div>`;
 }
 
 function downloadFile(content, filename, type) {
