@@ -224,6 +224,35 @@ main {
   cursor: pointer;
 }
 
+.properties-panel {
+  padding: 10px;
+  color: #fff;
+  font-size: 14px;
+}
+
+.prop-group {
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.prop-group label {
+  margin-bottom: 4px;
+  opacity: 0.8;
+}
+
+.prop-group input,
+.prop-group textarea {
+  background: #2f2f2f;
+  color: #fff;
+  border: 1px solid #444;
+  padding: 6px;
+}
+
+.textOnly {
+  display: none;
+}
+
 
 
 

@@ -1,46 +1,71 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
     <main>
-        <div class="app">
-            <aside class="left-panel">
-                <div class="sidebar-icons"></div>
-                <div class="sidebar-elements">
-                    <div class="title">
-                        <h2>Untitled</h2>
-                    </div>
-                    <div class="pages">
-                        <div class="elements">
-                            <h3>Pages</h3>
-                        </div>
-                        <div class="page"></div>
-                    </div>
-                    <div class="layers-panel">
-                        <h3>Layers</h3>
-                        <ul id="layer-list"></ul>
-                    </div>
-                </div>
-            </aside>
+      <div class="app">
+        <aside class="left-panel">
+          <div class="sidebar-icons"></div>
+          <div class="sidebar-elements">
+            <div class="title">
+              <h2>Untitled</h2>
+            </div>
+            <div class="pages">
+              <div class="elements">
+                <h3>Pages</h3>
+              </div>
+              <div class="page"></div>
+            </div>
+            <div class="layers-panel">
+              <h3>Layers</h3>
+              <ul id="layer-list"></ul>
+            </div>
+          </div>
+        </aside>
 
-            <div class="canvas">
-                <div class="tools">
-                    <button onclick="createRectangle()">Rectangle</button>
-                    <button onclick="createTextbox()">Text</button>
-                </div>
+        <div class="canvas">
+          <div class="tools">
+            <button onclick="createRectangle()">Rectangle</button>
+            <button onclick="createTextbox()">Text</button>
+          </div>
 
-                <!-- <div class="canvas-element rectangle" data-type="rectangle" id="elem-1"></div>
+          <!-- <div class="canvas-element rectangle" data-type="rectangle" id="elem-1"></div>
                 <div class="canvas-element text" data-type="textbox" id="elem-2"></div> -->
+        </div>
+
+        <aside class="right-panel">
+          <div class="props-panel">
+            <h3>Properties</h3>
+
+            <div class="prop-group">
+              <label>Width</label>
+              <input type="number" id="propWidth" min="1" />
             </div>
 
-            <aside class="right-panel"></aside>
-        </div>
-        <script src="script.js"></script>
+            <div class="prop-group">
+              <label>Height</label>
+              <input type="number" id="propHeight" min="1" />
+            </div>
+
+            <div class="prop-group">
+              <label>Background</label>
+              <input type="color" id="propBg" />
+            </div>
+
+            <div class="prop-group textOnly">
+              <label>Text</label>
+              <textarea id="propText" rows="3"></textarea>
+            </div>
+          </div>
+        </aside>
+        
+      </div>
+      <script src="script.js"></script>
     </main>
-</body>
+  </body>
 </html>

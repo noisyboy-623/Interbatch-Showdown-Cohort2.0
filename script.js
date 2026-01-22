@@ -31,6 +31,14 @@ let rotateRect = null;
 
 let allElem = [];
 
+const propWidth = document.getElementById("propWidth");
+const propHeight = document.getElementById("propHeight");
+const propBg = document.getElementById("propBg");
+const propText = document.getElementById("propText");
+const textOnlyGroup = document.querySelector(".textOnly");
+
+
+
 function generateId() {
   elemCounter++;
   return `elem-${elemCounter}`;
@@ -98,6 +106,12 @@ function createTextbox() {
     isEditingText = false;
   });
 
+  content.addEventListener("input", () => {
+    if (selectedElem === text) {
+      updatePropsPanel();
+    }
+  });
+
   canvas.appendChild(text);
   selectElem(text);
 }
@@ -112,6 +126,7 @@ function selectElem(elem) {
   addResizeHandles(elem);
 
   updateLayersPanel();
+  updatePropsPanel();
 }
 
 function deselectElem() {
@@ -122,6 +137,7 @@ function deselectElem() {
   selectedElem = null;
 
   updateLayersPanel();
+  updatePropsPanel();
 }
 
 canvas.addEventListener("mousedown", () => {
@@ -162,6 +178,7 @@ document.addEventListener("mousemove", (e) => {
   selectedElem.dataset.y = newTop;
 
   applyTransform(selectedElem);
+  updatePropsPanel();
 });
 
 // Resize and Rotate Logic
@@ -265,6 +282,7 @@ document.addEventListener("mousemove", (e) => {
   selectedElem.dataset.y = newY;
 
   applyTransform(selectedElem);
+  updatePropsPanel();
 });
 
 // Rotate Core Logic
@@ -301,6 +319,7 @@ document.addEventListener("mousemove", (e) => {
 
   selectedElem.dataset.rotation = rotation;
   applyTransform(selectedElem);
+  updatePropsPanel();
 
   selectedElem.dataset.rotation = rotation;
 });
@@ -330,68 +349,168 @@ function applyTransform(elem) {
   elem.style.transform = `translate(${x}px, ${y}px) rotate(${r}deg)`;
 }
 
-function updateLayersPanel(){
-    const list = document.getElementById('layer-list');
-    list.innerHTML = '';
+function updateLayersPanel() {
+  const list = document.getElementById("layer-list");
+  list.innerHTML = "";
 
-    [...allElem].slice().reverse().forEach((elem, idx) => {
-        const li = document.createElement('li');
-        li.classList.add('layer-item');
+  [...allElem]
+    .slice()
+    .reverse()
+    .forEach((elem, idx) => {
+      const li = document.createElement("li");
+      li.classList.add("layer-item");
 
-        if(elem === selectedElem){
-            li.classList.add('active');
-        }
+      if (elem === selectedElem) {
+        li.classList.add("active");
+      }
 
-        li.textContent = `${elem.dataset.type} (${elem.id})`
-        li.addEventListener('click', ()=>{
-            selectElem(elem);
-        });
+      li.textContent = `${elem.dataset.type} (${elem.id})`;
+      li.addEventListener("click", () => {
+        selectElem(elem);
+      });
 
-        const controls = document.createElement("div");
-        controls.classList.add("layer-controls");
+      const controls = document.createElement("div");
+      controls.classList.add("layer-controls");
 
-        const upBtn = document.createElement("button");
-        upBtn.textContent = "▲";
-        upBtn.onclick = (e) => {
+      const upBtn = document.createElement("button");
+      upBtn.textContent = "▲";
+      upBtn.onclick = (e) => {
         e.stopPropagation();
         moveLayerUp(elem);
-        };
+      };
 
-        const downBtn = document.createElement("button");
-        downBtn.textContent = "▼";
-        downBtn.onclick = (e) => {
+      const downBtn = document.createElement("button");
+      downBtn.textContent = "▼";
+      downBtn.onclick = (e) => {
         e.stopPropagation();
         moveLayerDown(elem);
-        };
+      };
 
-        controls.appendChild(upBtn);
-        controls.appendChild(downBtn);
-        li.appendChild(controls);
+      controls.appendChild(upBtn);
+      controls.appendChild(downBtn);
+      li.appendChild(controls);
 
-        list.appendChild(li);
+      list.appendChild(li);
     });
 }
 
-function updateZIndex(){
-    allElem.forEach((elem, idx) => {
-        elem.style.zIndex = idx;
-    });
+function updateZIndex() {
+  allElem.forEach((elem, idx) => {
+    elem.style.zIndex = idx;
+  });
 }
 
-function moveLayerUp(elem){
-    const index = allElem.indexOf(elem);
-    if(index === -1 || index === allElem.length-1) return
+function moveLayerUp(elem) {
+  const index = allElem.indexOf(elem);
+  if (index === -1 || index === allElem.length - 1) return;
 
-    [allElem[index], allElem[index+1]] = [allElem[index+1], allElem[index]]
-    updateZIndex();
-    updateLayersPanel();
+  [allElem[index], allElem[index + 1]] = [allElem[index + 1], allElem[index]];
+  updateZIndex();
+  updateLayersPanel();
 }
 
-function moveLayerDown(elem){
-    const index = allElem.indexOf(elem);
-    if(index <= 0) return
+function moveLayerDown(elem) {
+  const index = allElem.indexOf(elem);
+  if (index <= 0) return;
 
-    [allElem[index], allElem[index-1]] = [allElem[index-1], allElem[index]]
-    updateZIndex();
-    updateLayersPanel();
+  [allElem[index], allElem[index - 1]] = [allElem[index - 1], allElem[index]];
+  updateZIndex();
+  updateLayersPanel();
 }
+
+// function updatePropsPanel(){
+//   if(!selectedElem){
+//     propWidth.value = "";
+//     propHeight.value = "";
+//     propBg.value = "#000000";
+//     propText.value = "";
+//     textOnlyGroup.style.display = "none";
+//     return;
+//   }
+
+//   const width = selectedElem.offsetWidth;
+//   const height = selectedElem.offsetHeight;
+
+//   propWidth.value = Math.round(width);
+//   propHeight.value = Math.round(height);
+
+//   const bg = window.getComputedStyle(selectedElem).backgroundColor;
+//   propBg.value = rgbToHex(bg);
+
+//   if(selectedElem.dataset.type === "textbox"){
+//     textOnlyGroup.style.display = "flex";
+
+//     const textContent = selectedElem.querySelector(".text-content")
+//     propText.value = textContent.innerText;
+//   } else {
+//     textOnlyGroup.style.display = "none";
+//   }
+// }
+
+function updatePropsPanel() {
+  textOnlyGroup.style.display = "none";
+
+  if (!selectedElem) {
+    propWidth.value = "";
+    propHeight.value = "";
+    propBg.value = "#000000";
+    propText.value = "";
+    textOnlyGroup.style.display = "none";
+    return;
+  }
+
+  propWidth.value = Math.round(selectedElem.offsetWidth);
+  propHeight.value = Math.round(selectedElem.offsetHeight);
+
+  const bg = window.getComputedStyle(selectedElem).backgroundColor;
+  propBg.value = rgbToHex(bg);
+
+  if (selectedElem.dataset.type === "textbox") {
+    textOnlyGroup.style.display = "flex";
+    const textContent = selectedElem.querySelector(".text-content");
+    propText.value = textContent.innerText;
+  } else {
+    textOnlyGroup.style.display = "none";
+  }
+}
+
+function rgbToHex(rgb) {
+  const result = rgb.match(/\d+/g);
+  if (!result) return "#000000";
+
+  return (
+    "#" + result.map((x) => parseInt(x).toString(16).padStart(2, "0")).join("")
+  );
+}
+
+propWidth.addEventListener("input", () => {
+  if (!selectedElem) return;
+
+  const value = Math.max(1, propWidth.value);
+  selectedElem.style.width = `${value}px`;
+  selectedElem.dataset.width = value;
+});
+
+propHeight.addEventListener("input", () => {
+  if (!selectedElem) return;
+
+  const value = Math.max(1, propHeight.value);
+  selectedElem.style.height = `${value}px`;
+  selectedElem.dataset.height = value;
+});
+
+propBg.addEventListener("input", () => {
+  if (!selectedElem) return;
+
+  selectedElem.style.backgroundColor = propBg.value;
+});
+
+propText.addEventListener("input", () => {
+  if (!selectedElem) return;
+  if (selectedElem.dataset.type !== "textbox") return;
+
+  const content = selectedElem.querySelector(".text-content");
+  content.innerText = propText.value;
+});
+
+
