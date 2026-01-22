@@ -130,7 +130,6 @@ function selectElem(elem) {
 
   updateLayersPanel();
   updatePropsPanel();
-  saveDataToLocalStorage();
 }
 
 function deselectElem() {
@@ -376,6 +375,7 @@ function updateLayersPanel() {
       controls.classList.add("layer-controls");
 
       const upBtn = document.createElement("button");
+      upBtn.classList.add("upBtn");
       upBtn.textContent = "▲";
       upBtn.onclick = (e) => {
         e.stopPropagation();
@@ -383,6 +383,7 @@ function updateLayersPanel() {
       };
 
       const downBtn = document.createElement("button");
+      downBtn.classList.add("downBtn");
       downBtn.textContent = "▼";
       downBtn.onclick = (e) => {
         e.stopPropagation();
@@ -536,7 +537,6 @@ function handleKeyControls(e){
 
   switch (e.key) {
     case "Delete":
-    case "Backspace":
       e.preventDefault();
       deleteSelectedElement();
       return;
@@ -620,7 +620,7 @@ function loadDataFromLocalStorage() {
   const data = JSON.parse(raw);
 
   allElem = [];
-  canvasContent.innerHTML = ""; // clear canvas
+  canvasContent.innerHTML = "";
 
   data.forEach(item => {
     let elem;
@@ -644,6 +644,15 @@ function loadDataFromLocalStorage() {
         isEditingText = false;
         saveDataToLocalStorage();
       });
+
+      content.addEventListener("input", () => {
+    if (selectedElem === text) {
+      updatePropsPanel();
+    }
+  });
+
+  
+
 
       elem.appendChild(content);
     }
@@ -681,6 +690,120 @@ function loadDataFromLocalStorage() {
   updateLayersPanel();
   
 }
+
+function fetchData() {
+  return allElem.map(elem => {
+    const computedBg = getComputedStyle(elem).backgroundColor;
+
+    const data = {
+      id: elem.id,
+      type: elem.dataset.type,
+      x: parseFloat(elem.dataset.x) || 0,
+      y: parseFloat(elem.dataset.y) || 0,
+      width: elem.offsetWidth,
+      height: elem.offsetHeight,
+      rotation: parseFloat(elem.dataset.rotation) || 0,
+      styles: {
+        backgroundColor:
+          computedBg !== "rgba(0, 0, 0, 0)" ? computedBg : ""
+      }
+    };
+
+    if (data.type === "textbox") {
+      const content = elem.querySelector(".text-content");
+      data.content = content ? content.innerText : "";
+    }
+
+    return data;
+  });
+}
+
+
+function exportAsJSON() {
+  const data = fetchData();
+  const json = JSON.stringify(data, null, 2);
+
+  downloadFile(json, "design.json", "application/json");
+}
+
+function exportAsHTML() {
+  const data = fetchData();
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Exported Design</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #2c2c2c; /* 👈 page background */
+    }
+    .canvas {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: #2c2c2c; /* 👈 canvas background */
+    }
+  </style>
+</head>
+<body>
+  <div class="canvas">
+    ${data.map(item => generateHTML(item)).join("\n")}
+  </div>
+</body>
+</html>
+`;
+
+  downloadFile(html, "design.html", "text/html");
+}
+
+
+function generateHTML(item) {
+  const baseStyle = `
+    position: absolute;
+    width: ${item.width}px;
+    height: ${item.height}px;
+    transform: translate(${item.x}px, ${item.y}px) rotate(${item.rotation}deg);
+    transform-origin: center center;
+    background-color: ${item.styles.backgroundColor || "#ffffff"};
+  `;
+
+  if (item.type === "textbox") {
+  return `
+<div style="${baseStyle}">
+  <div style="
+    width:100%;
+    height:100%;
+    white-space:pre-wrap;
+    color: #000;              
+    font-family: sans-serif;   
+  ">
+    ${item.content || ""}
+  </div>
+</div>`;
+}
+
+
+  return `<div style="${baseStyle}"></div>`;
+}
+
+
+function downloadFile(content, filename, type) {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+
 
 loadDataFromLocalStorage();
 
