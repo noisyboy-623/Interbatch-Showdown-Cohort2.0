@@ -38,6 +38,8 @@ const propHeight = document.getElementById("propHeight");
 const propBg = document.getElementById("propBg");
 const propText = document.getElementById("propText");
 const textOnlyGroup = document.querySelector(".textOnly");
+const propsPanel = document.querySelector(".props-panel");
+const propsEmpty = document.querySelector(".props-empty");
 
 document.addEventListener("keydown", handleKeyControls);
 
@@ -68,7 +70,7 @@ function createRectangle() {
 
   canvasContent.appendChild(rect);
   selectElem(rect);
-    saveDataToLocalStorage();
+  saveDataToLocalStorage();
 }
 
 function createTextbox() {
@@ -130,6 +132,7 @@ function selectElem(elem) {
 
   updateLayersPanel();
   updatePropsPanel();
+  updatePropertiesVisibility();
 }
 
 function deselectElem() {
@@ -141,6 +144,7 @@ function deselectElem() {
 
   updateLayersPanel();
   updatePropsPanel();
+  updatePropertiesVisibility();
 }
 
 canvas.addEventListener("mousedown", () => {
@@ -451,6 +455,16 @@ function moveLayerDown(elem) {
 //   }
 // }
 
+function updatePropertiesVisibility() {
+  if (selectedElem) {
+    propsPanel.style.display = "block";
+    propsEmpty.style.display = "none";
+  } else {
+    propsPanel.style.display = "none";
+    propsEmpty.style.display = "flex";
+  }
+}
+
 function updatePropsPanel() {
   textOnlyGroup.style.display = "none";
 
@@ -493,7 +507,7 @@ propWidth.addEventListener("input", () => {
   const value = Math.max(1, propWidth.value);
   selectedElem.style.width = `${value}px`;
   selectedElem.dataset.width = value;
-    saveDataToLocalStorage();
+  saveDataToLocalStorage();
 });
 
 propHeight.addEventListener("input", () => {
@@ -502,16 +516,14 @@ propHeight.addEventListener("input", () => {
   const value = Math.max(1, propHeight.value);
   selectedElem.style.height = `${value}px`;
   selectedElem.dataset.height = value;
-    saveDataToLocalStorage();
-
+  saveDataToLocalStorage();
 });
 
 propBg.addEventListener("input", () => {
   if (!selectedElem) return;
 
   selectedElem.style.backgroundColor = propBg.value;
-    saveDataToLocalStorage();
-
+  saveDataToLocalStorage();
 });
 
 propText.addEventListener("input", () => {
@@ -520,18 +532,17 @@ propText.addEventListener("input", () => {
 
   const content = selectedElem.querySelector(".text-content");
   content.innerText = propText.value;
-    saveDataToLocalStorage();
-
+  saveDataToLocalStorage();
 });
 
-function handleKeyControls(e){
-  if(!selectedElem) return;
+function handleKeyControls(e) {
+  if (!selectedElem) return;
 
-  if(isEditingText) return;
+  if (isEditingText) return;
 
-  let xVal = parseFloat(selectedElem.dataset.x)||0;
-  let yVal = parseFloat(selectedElem.dataset.y)||0;
-  
+  let xVal = parseFloat(selectedElem.dataset.x) || 0;
+  let yVal = parseFloat(selectedElem.dataset.y) || 0;
+
   const canvasRect = canvas.getBoundingClientRect();
   const elemRect = selectedElem.getBoundingClientRect();
 
@@ -589,26 +600,26 @@ function deleteSelectedElement() {
   saveDataToLocalStorage();
 }
 
-function saveDataToLocalStorage(){
-  const data = allElem.map(elem => {
+function saveDataToLocalStorage() {
+  const data = allElem.map((elem) => {
     const obj = {
       id: elem.id,
       type: elem.dataset.type,
-      x: parseFloat(elem.dataset.x)||0,
-      y: parseFloat(elem.dataset.y)||0,
+      x: parseFloat(elem.dataset.x) || 0,
+      y: parseFloat(elem.dataset.y) || 0,
       width: elem.offsetWidth,
       height: elem.offsetHeight,
-      rotation: parseFloat(elem.dataset.rotation)||0,
+      rotation: parseFloat(elem.dataset.rotation) || 0,
       styles: {
-        backgroundColor: elem.style.backgroundColor||""
-      }
+        backgroundColor: elem.style.backgroundColor || "",
+      },
     };
 
-      if(obj.type === "textbox"){
-        const content = elem.querySelector(".text-content");
-        obj.content = content ? content.innerText : "";
-      }
-      return obj;
+    if (obj.type === "textbox") {
+      const content = elem.querySelector(".text-content");
+      obj.content = content ? content.innerText : "";
+    }
+    return obj;
   });
   localStorage.setItem("canvasElements", JSON.stringify(data));
 }
@@ -622,7 +633,7 @@ function loadDataFromLocalStorage() {
   allElem = [];
   canvasContent.innerHTML = "";
 
-  data.forEach(item => {
+  data.forEach((item) => {
     let elem;
 
     if (item.type === "rectangle") {
@@ -646,13 +657,10 @@ function loadDataFromLocalStorage() {
       });
 
       content.addEventListener("input", () => {
-    if (selectedElem === text) {
-      updatePropsPanel();
-    }
-  });
-
-  
-
+        if (selectedElem === text) {
+          updatePropsPanel();
+        }
+      });
 
       elem.appendChild(content);
     }
@@ -688,11 +696,11 @@ function loadDataFromLocalStorage() {
 
   updateZIndex();
   updateLayersPanel();
-  
+  updatePropertiesVisibility();
 }
 
 function fetchData() {
-  return allElem.map(elem => {
+  return allElem.map((elem) => {
     const computedBg = getComputedStyle(elem).backgroundColor;
 
     const data = {
@@ -704,9 +712,8 @@ function fetchData() {
       height: elem.offsetHeight,
       rotation: parseFloat(elem.dataset.rotation) || 0,
       styles: {
-        backgroundColor:
-          computedBg !== "rgba(0, 0, 0, 0)" ? computedBg : ""
-      }
+        backgroundColor: computedBg !== "rgba(0, 0, 0, 0)" ? computedBg : "",
+      },
     };
 
     if (data.type === "textbox") {
@@ -717,7 +724,6 @@ function fetchData() {
     return data;
   });
 }
-
 
 function exportAsJSON() {
   const data = fetchData();
@@ -751,7 +757,7 @@ function exportAsHTML() {
 </head>
 <body>
   <div class="canvas">
-    ${data.map(item => generateHTML(item)).join("\n")}
+    ${data.map((item) => generateHTML(item)).join("\n")}
   </div>
 </body>
 </html>
@@ -759,7 +765,6 @@ function exportAsHTML() {
 
   downloadFile(html, "design.html", "text/html");
 }
-
 
 function generateHTML(item) {
   const baseStyle = `
@@ -772,7 +777,7 @@ function generateHTML(item) {
   `;
 
   if (item.type === "textbox") {
-  return `
+    return `
 <div style="${baseStyle}">
   <div style="
     width:100%;
@@ -784,12 +789,10 @@ function generateHTML(item) {
     ${item.content || ""}
   </div>
 </div>`;
-}
-
+  }
 
   return `<div style="${baseStyle}"></div>`;
 }
-
 
 function downloadFile(content, filename, type) {
   const blob = new Blob([content], { type });
@@ -803,8 +806,4 @@ function downloadFile(content, filename, type) {
   URL.revokeObjectURL(url);
 }
 
-
-
 loadDataFromLocalStorage();
-
-

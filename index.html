@@ -5,12 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.8.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <main>
       <div class="app">
         <aside class="left-panel">
-          <div class="sidebar-icons"></div>
+          <div class="sidebar-icons">
+            <div class="icon-item logo">
+              <i class="ri-figma-line"></i>
+            </div>
+
+            <span class="icon-divider"></span>
+
+            <div class="icon-item active">
+              <i class="ri-file-3-line"></i>
+              <span>File</span>
+            </div>
+
+            <div class="icon-item">
+              <i class="ri-add-circle-line"></i>
+              <span>Assets</span>
+            </div>
+
+            <div class="icon-item">
+              <i class="ri-search-line"></i>
+              <span>Find</span>
+            </div>
+
+            <span class="icon-divider"></span>
+
+            <div class="icon-item">
+              <i class="ri-settings-line"></i>
+              <span>Variables</span>
+            </div>
+          </div>
           <div class="sidebar-elements">
             <div class="title">
               <h2>Untitled</h2>
@@ -19,7 +51,7 @@
               <div class="elements">
                 <h3>Pages</h3>
               </div>
-              <div class="page"></div>
+              <div class="page"><p>Page 1</p></div>
             </div>
             <div class="layers-panel">
               <h3>Layers</h3>
@@ -30,10 +62,16 @@
 
         <div class="canvas">
           <div class="tools">
-            <button onclick="createRectangle()">Rectangle</button>
-            <button onclick="createTextbox()">Text</button>
-            <button onclick="exportAsJSON()">Export JSON</button>
-            <button onclick="exportAsHTML()">Export HTML</button>
+            <button onclick="createRectangle()">
+              <i class="ri-rectangle-line"></i>
+            </button>
+            <button onclick="createTextbox()"><i class="ri-text"></i></button>
+            <button onclick="exportAsJSON()">
+              <i class="ri-file-code-line"></i>
+            </button>
+            <button onclick="exportAsHTML()">
+              <i class="ri-html5-line"></i>
+            </button>
           </div>
           <div class="canvas-content"></div>
           <!-- <div class="canvas-element rectangle" data-type="rectangle" id="elem-1"></div>
@@ -41,6 +79,10 @@
         </div>
 
         <aside class="right-panel">
+          <div class="props-empty" id="props-empty">
+            <p>Select an element to edit its properties</p>
+          </div>
+
           <div class="props-panel">
             <h3>Properties</h3>
 
