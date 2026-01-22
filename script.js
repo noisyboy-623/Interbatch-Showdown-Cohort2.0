@@ -48,6 +48,26 @@ function generateId() {
   return `elem-${elemCounter}`;
 }
 
+function syncElemCounter() {
+  if (allElem.length === 0) {
+    elemCounter = 0;
+    return;
+  }
+
+  let maxId = 0;
+
+  allElem.forEach(elem => {
+    const match = elem.id.match(/elem-(\d+)/);
+    if (match) {
+      const num = parseInt(match[1], 10);
+      if (num > maxId) maxId = num;
+    }
+  });
+
+  elemCounter = maxId;
+}
+
+
 function createRectangle() {
   const rect = document.createElement("div");
 
@@ -632,6 +652,7 @@ function loadDataFromLocalStorage() {
 
   allElem = [];
   canvasContent.innerHTML = "";
+  syncElemCounter();
 
   data.forEach((item) => {
     let elem;
@@ -697,7 +718,11 @@ function loadDataFromLocalStorage() {
   updateZIndex();
   updateLayersPanel();
   updatePropertiesVisibility();
-}
+
+  
+syncElemCounter();
+
+};
 
 function fetchData() {
   return allElem.map((elem) => {
