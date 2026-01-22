@@ -37,7 +37,7 @@ const propBg = document.getElementById("propBg");
 const propText = document.getElementById("propText");
 const textOnlyGroup = document.querySelector(".textOnly");
 
-
+document.addEventListener("keydown", handleKeyControls);
 
 function generateId() {
   elemCounter++;
@@ -513,4 +513,68 @@ propText.addEventListener("input", () => {
   content.innerText = propText.value;
 });
 
+function handleKeyControls(e){
+  if(!selectedElem) return;
+
+  if(isEditingText) return;
+
+  let xVal = parseFloat(selectedElem.dataset.x)||0;
+  let yVal = parseFloat(selectedElem.dataset.y)||0;
+  
+  const canvasRect = canvas.getBoundingClientRect();
+  const elemRect = selectedElem.getBoundingClientRect();
+
+  switch (e.key) {
+    case "Delete":
+    case "Backspace":
+      e.preventDefault();
+      deleteSelectedElement();
+      return;
+
+    case "ArrowLeft":
+      e.preventDefault();
+      xVal -= 5;
+      break;
+
+    case "ArrowRight":
+      e.preventDefault();
+      xVal += 5;
+      break;
+
+    case "ArrowUp":
+      e.preventDefault();
+      yVal -= 5;
+      break;
+
+    case "ArrowDown":
+      e.preventDefault();
+      yVal += 5;
+      break;
+
+    default:
+      return;
+  }
+
+  xVal = Math.max(0, Math.min(xVal, canvasRect.width - elemRect.width));
+  yVal = Math.max(0, Math.min(yVal, canvasRect.height - elemRect.height));
+
+  selectedElem.dataset.x = xVal;
+  selectedElem.dataset.y = yVal;
+
+  applyTransform(selectedElem);
+  updatePropsPanel();
+}
+
+function deleteSelectedElement() {
+  if (!selectedElem) return;
+
+  const index = allElem.indexOf(selectedElem);
+  if (index !== -1) {
+    allElem.splice(index, 1);
+  }
+  selectedElem.remove();
+
+  selectedElem = null;
+  updateLayersPanel();
+}
 
