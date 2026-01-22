@@ -193,6 +193,37 @@ main {
   cursor: grab;
 }
 
+.layers-panel {
+  padding: 10px;
+  color: #fff;
+  font-size: 14px;
+}
+
+.layers-panel ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.layer-item {
+  padding: 6px 8px;
+  margin-bottom: 4px;
+  background: #2f2f2f;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.layer-item.active {
+  background: #4da3ff;
+}
+
+.layer-controls button {
+  margin-left: 4px;
+  cursor: pointer;
+}
+
 
 
 

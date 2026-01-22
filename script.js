@@ -29,6 +29,8 @@ let rotateCenterX = 0;
 let rotateCenterY = 0;
 let rotateRect = null;
 
+let allElem = [];
+
 function generateId() {
   elemCounter++;
   return `elem-${elemCounter}`;
@@ -39,6 +41,9 @@ function createRectangle() {
 
   rect.classList.add("canvas-element", "rectangle");
   rect.dataset.type = "rectangle";
+  allElem.push(rect);
+  updateLayersPanel();
+  updateZIndex();
   rect.id = generateId();
 
   rect.dataset.x = "0";
@@ -60,6 +65,9 @@ function createTextbox() {
 
   text.classList.add("canvas-element", "text");
   text.dataset.type = "textbox";
+  allElem.push(text);
+  updateLayersPanel();
+  updateZIndex();
   text.id = generateId();
 
   text.dataset.rotation = "0";
@@ -102,6 +110,8 @@ function selectElem(elem) {
   selectedElem = elem;
   selectedElem.classList.add("selected");
   addResizeHandles(elem);
+
+  updateLayersPanel();
 }
 
 function deselectElem() {
@@ -110,6 +120,8 @@ function deselectElem() {
   removeResizeHandles(selectedElem);
   selectedElem.classList.remove("selected");
   selectedElem = null;
+
+  updateLayersPanel();
 }
 
 canvas.addEventListener("mousedown", () => {
@@ -293,24 +305,6 @@ document.addEventListener("mousemove", (e) => {
   selectedElem.dataset.rotation = rotation;
 });
 
-// function clampRotatedElement() {
-//   const rect = selectedElem.getBoundingClientRect();
-//   const canvasRect = canvas.getBoundingClientRect();
-
-//   let left = rect.left - canvasRect.left;
-//   let top = rect.top - canvasRect.top;
-
-//   if (left < 0) left = 0;
-//   if (top < 0) top = 0;
-//   if (left + rect.width > canvasRect.width)
-//     left = canvasRect.width - rect.width;
-//   if (top + rect.height > canvasRect.height)
-//     top = canvasRect.height - rect.height;
-
-//   selectedElem.style.left = `${left}px`;
-//   selectedElem.style.top = `${top}px`;
-// }
-
 document.addEventListener("mouseup", () => {
   if (isDragging) {
     isDragging = false;
@@ -323,7 +317,6 @@ document.addEventListener("mouseup", () => {
 
   if (isRotating) {
     isRotating = false;
-    // clampRotatedElement();
   }
 
   document.body.style.userSelect = "";
@@ -335,4 +328,70 @@ function applyTransform(elem) {
   const r = parseFloat(elem.dataset.rotation) || 0;
 
   elem.style.transform = `translate(${x}px, ${y}px) rotate(${r}deg)`;
+}
+
+function updateLayersPanel(){
+    const list = document.getElementById('layer-list');
+    list.innerHTML = '';
+
+    [...allElem].slice().reverse().forEach((elem, idx) => {
+        const li = document.createElement('li');
+        li.classList.add('layer-item');
+
+        if(elem === selectedElem){
+            li.classList.add('active');
+        }
+
+        li.textContent = `${elem.dataset.type} (${elem.id})`
+        li.addEventListener('click', ()=>{
+            selectElem(elem);
+        });
+
+        const controls = document.createElement("div");
+        controls.classList.add("layer-controls");
+
+        const upBtn = document.createElement("button");
+        upBtn.textContent = "▲";
+        upBtn.onclick = (e) => {
+        e.stopPropagation();
+        moveLayerUp(elem);
+        };
+
+        const downBtn = document.createElement("button");
+        downBtn.textContent = "▼";
+        downBtn.onclick = (e) => {
+        e.stopPropagation();
+        moveLayerDown(elem);
+        };
+
+        controls.appendChild(upBtn);
+        controls.appendChild(downBtn);
+        li.appendChild(controls);
+
+        list.appendChild(li);
+    });
+}
+
+function updateZIndex(){
+    allElem.forEach((elem, idx) => {
+        elem.style.zIndex = idx;
+    });
+}
+
+function moveLayerUp(elem){
+    const index = allElem.indexOf(elem);
+    if(index === -1 || index === allElem.length-1) return
+
+    [allElem[index], allElem[index+1]] = [allElem[index+1], allElem[index]]
+    updateZIndex();
+    updateLayersPanel();
+}
+
+function moveLayerDown(elem){
+    const index = allElem.indexOf(elem);
+    if(index <= 0) return
+
+    [allElem[index], allElem[index-1]] = [allElem[index-1], allElem[index]]
+    updateZIndex();
+    updateLayersPanel();
 }
