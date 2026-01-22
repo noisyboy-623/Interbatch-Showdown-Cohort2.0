@@ -1,4 +1,6 @@
-let canvas = document.querySelector(".canvas");
+window.addEventListener("beforeunload", saveDataToLocalStorage);
+const canvas = document.querySelector(".canvas");
+const canvasContent = document.querySelector(".canvas-content");
 
 let elemCounter = 0;
 
@@ -64,8 +66,9 @@ function createRectangle() {
     startDrag(e);
   });
 
-  canvas.appendChild(rect);
+  canvasContent.appendChild(rect);
   selectElem(rect);
+    saveDataToLocalStorage();
 }
 
 function createTextbox() {
@@ -112,7 +115,7 @@ function createTextbox() {
     }
   });
 
-  canvas.appendChild(text);
+  canvasContent.appendChild(text);
   selectElem(text);
 }
 
@@ -127,6 +130,7 @@ function selectElem(elem) {
 
   updateLayersPanel();
   updatePropsPanel();
+  saveDataToLocalStorage();
 }
 
 function deselectElem() {
@@ -276,8 +280,6 @@ document.addEventListener("mousemove", (e) => {
   selectedElem.style.width = `${newWidth}px`;
   selectedElem.style.height = `${newHeight}px`;
 
-  selectedElem.dataset.width = newWidth;
-  selectedElem.dataset.height = newHeight;
   selectedElem.dataset.x = newX;
   selectedElem.dataset.y = newY;
 
@@ -338,6 +340,7 @@ document.addEventListener("mouseup", () => {
     isRotating = false;
   }
 
+  saveDataToLocalStorage();
   document.body.style.userSelect = "";
 });
 
@@ -489,6 +492,7 @@ propWidth.addEventListener("input", () => {
   const value = Math.max(1, propWidth.value);
   selectedElem.style.width = `${value}px`;
   selectedElem.dataset.width = value;
+    saveDataToLocalStorage();
 });
 
 propHeight.addEventListener("input", () => {
@@ -497,12 +501,16 @@ propHeight.addEventListener("input", () => {
   const value = Math.max(1, propHeight.value);
   selectedElem.style.height = `${value}px`;
   selectedElem.dataset.height = value;
+    saveDataToLocalStorage();
+
 });
 
 propBg.addEventListener("input", () => {
   if (!selectedElem) return;
 
   selectedElem.style.backgroundColor = propBg.value;
+    saveDataToLocalStorage();
+
 });
 
 propText.addEventListener("input", () => {
@@ -511,6 +519,8 @@ propText.addEventListener("input", () => {
 
   const content = selectedElem.querySelector(".text-content");
   content.innerText = propText.value;
+    saveDataToLocalStorage();
+
 });
 
 function handleKeyControls(e){
@@ -576,5 +586,102 @@ function deleteSelectedElement() {
 
   selectedElem = null;
   updateLayersPanel();
+  saveDataToLocalStorage();
 }
+
+function saveDataToLocalStorage(){
+  const data = allElem.map(elem => {
+    const obj = {
+      id: elem.id,
+      type: elem.dataset.type,
+      x: parseFloat(elem.dataset.x)||0,
+      y: parseFloat(elem.dataset.y)||0,
+      width: elem.offsetWidth,
+      height: elem.offsetHeight,
+      rotation: parseFloat(elem.dataset.rotation)||0,
+      styles: {
+        backgroundColor: elem.style.backgroundColor||""
+      }
+    };
+
+      if(obj.type === "textbox"){
+        const content = elem.querySelector(".text-content");
+        obj.content = content ? content.innerText : "";
+      }
+      return obj;
+  });
+  localStorage.setItem("canvasElements", JSON.stringify(data));
+}
+
+function loadDataFromLocalStorage() {
+  const raw = localStorage.getItem("canvasElements");
+  if (!raw) return;
+
+  const data = JSON.parse(raw);
+
+  allElem = [];
+  canvasContent.innerHTML = ""; // clear canvas
+
+  data.forEach(item => {
+    let elem;
+
+    if (item.type === "rectangle") {
+      elem = document.createElement("div");
+      elem.classList.add("canvas-element", "rectangle");
+    }
+
+    if (item.type === "textbox") {
+      elem = document.createElement("div");
+      elem.classList.add("canvas-element", "text");
+
+      const content = document.createElement("div");
+      content.classList.add("text-content");
+      content.contentEditable = true;
+      content.dataset.placeholder = "Type text…";
+      content.innerText = item.content || "";
+
+      content.addEventListener("blur", () => {
+        isEditingText = false;
+        saveDataToLocalStorage();
+      });
+
+      elem.appendChild(content);
+    }
+
+    // Core metadata
+    elem.id = item.id;
+    elem.dataset.type = item.type;
+    elem.dataset.x = item.x;
+    elem.dataset.y = item.y;
+    elem.dataset.rotation = item.rotation;
+
+    // Size
+    elem.style.width = `${item.width}px`;
+    elem.style.height = `${item.height}px`;
+
+    // Styles
+    if (item.styles?.backgroundColor) {
+      elem.style.backgroundColor = item.styles.backgroundColor;
+    }
+
+    // Interactions
+    elem.addEventListener("mousedown", (e) => {
+      e.stopPropagation();
+      selectElem(elem);
+      startDrag(e);
+    });
+
+    canvasContent.appendChild(elem);
+    allElem.push(elem);
+
+    applyTransform(elem);
+  });
+
+  updateZIndex();
+  updateLayersPanel();
+  
+}
+
+loadDataFromLocalStorage();
+
 
